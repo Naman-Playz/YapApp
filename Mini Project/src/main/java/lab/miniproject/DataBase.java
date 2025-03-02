@@ -1,6 +1,18 @@
 import java.sql.*;
 import java.time.Instant;
 
+class UserAlreadyExistsException extends Exception {
+    UserAlreadyExistsException(String message) {
+        super(message);
+    }
+}
+
+class ChannelAlreadyExistsException extends Exception {
+    ChannelAlreadyExistsException(String message) {
+        super(message);
+    }
+}
+
 class DataBase {
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/YapApp.DB";
     private static final String USER = "yapApp_Server";
@@ -30,42 +42,37 @@ class DataBase {
         }
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException, UserAlreadyExistsException, ChannelAlreadyExistsException {
         DataBase db = new DataBase();
 
-        String userEmail = "k.shivaram252@gmail.com";
-        String username = "True_Lord";
-        String password = "CertifiedYapper";
+        String userEmail1 = "k.shivaram252@gmail.com";
+        String username1 = "True_Lord";
+        String password1 = "CertifiedYapper";
 
-        db.createUser(userEmail, username, password);
+        String userEmail2 = "Naman.and68@gmail.com";
+        String username2 = "Naman_playz";
+        String password2 = "Poki";
+
+        db.createUser(userEmail1, username1, password1);
+        db.createUser(userEmail2, username2, password2);
+        db.updatePassword(userEmail1, password2);
+        db.updateUsername(userEmail2, "Naman_plays");
 
         String channelName = "SharkDuDu";
-        db.createChannel(channelName, userEmail);
+        String channel_id = db.createChannel(channelName, userEmail1);
+        db.addUserToChannel(userEmail2, channel_id);
 
-        String query = "SELECT channel_id FROM user_channels WHERE email = ?";
-        String channel_id = null;
+        db.sendMessage(channel_id, userEmail1, "Sup?");
+        db.sendMessage(channel_id, userEmail2, "Nothing much, how are you?");
+        db.sendMessage(channel_id, userEmail1, "Doing well. It's been awhile since we last talked.");
+        db.sendMessage(channel_id, userEmail2, "Indeed.");
+        db.sendMessage(channel_id, userEmail1, "Okay talk to you later.");
+        db.sendMessage(channel_id, userEmail2, "Bye.");
 
-        try (PreparedStatement stmt = db.connection.prepareStatement(query)) {
-            stmt.setString(1, userEmail);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                channel_id = rs.getString("channel_id");
-                System.out.println("Retrieved channel_id: " + channel_id);
-            } else {
-                System.out.println("No channel_id found for email: " + userEmail);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (channel_id == null || channel_id.isEmpty()) {
-            System.out.println("Error: channelId is null or empty. Cannot send message.");
-        } else {
-            String messageContent = "Sup?";
-            db.sendMessage(channel_id, userEmail, messageContent);
-        }
+        db.removeUserFromChannel(userEmail2, channel_id);
+        db.deleteChannel(channel_id);
+        db.deleteUser(userEmail2);
+        db.deleteUser(userEmail1);
     }
 
     public boolean createUser(String email, String username, String password) {
@@ -82,12 +89,12 @@ class DataBase {
 
             return rowsAffected > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            e.getSQLState();
             return false;
         }
     }
 
-    public boolean createChannel(String channel_name, String email) {
+    public String createChannel(String channel_name, String email) throws ChannelAlreadyExistsException {
         int channel_id = -1;
         String insertChannelSQL = "INSERT INTO channels (channel_name) VALUES (?) RETURNING channel_id";
         String insertUserSQL = "INSERT INTO user_channels (email, channel_id) VALUES (?, ?)";
@@ -104,7 +111,7 @@ class DataBase {
 
             if (channel_id == -1) {
                 System.out.println("Failed to create channel.");
-                return false;
+                return null;
             }
 
             String tableName = "channel_" + channel_id;
@@ -128,11 +135,11 @@ class DataBase {
 
             System.out.println("Channel '" + channel_name + "' created successfully! (Table: " + tableName + ")");
 
-            return true;
+            return tableName;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 
@@ -175,7 +182,7 @@ class DataBase {
 
         try (PreparedStatement addUserStmt = connection.prepareStatement(addUserSQL)) {
             addUserStmt.setString(1, email);
-            addUserStmt.setString(2, channel_id);
+            addUserStmt.setInt(2, Integer.parseInt(channel_id.replace("channel_","")));
             return addUserStmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -188,7 +195,7 @@ class DataBase {
 
         try (PreparedStatement removeUserStmt = connection.prepareStatement(removeUserSQL)) {
             removeUserStmt.setString(1, email);
-            removeUserStmt.setString(2, channel_id);
+            removeUserStmt.setInt(2, Integer.parseInt(channel_id.replace("channel_","")));
             return removeUserStmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -205,12 +212,12 @@ class DataBase {
              Statement dropTableStmt = connection.createStatement();
              PreparedStatement deleteChannelStmt = connection.prepareStatement(deleteChannelSQL)) {
 
-            deleteUsersStmt.setString(1, channel_id);
+            deleteUsersStmt.setInt(1, Integer.parseInt(channel_id.replace("channel_","")));
             deleteUsersStmt.executeUpdate();
 
             dropTableStmt.executeUpdate(dropTableSQL);
 
-            deleteChannelStmt.setString(1, channel_id);
+            deleteChannelStmt.setInt(1, Integer.parseInt(channel_id.replace("channel_","")));
             int rowsDeleted = deleteChannelStmt.executeUpdate();
 
             return rowsDeleted > 0;
@@ -243,7 +250,7 @@ class DataBase {
     }
 
     public boolean sendMessage(String channel_id, String senderEmail, String content) {
-        String tableName = "channel_" + channel_id;
+        String tableName = channel_id;
         if (!isValidTableName(tableName)) {
             System.out.println("Invalid table name: " + tableName);
             return false;
