@@ -1,3 +1,6 @@
+import java.sql.*;
+import java.time.Instant;
+
 class DataBase {
     private static final String DB_URL = "jdbc:postgresql://localhost:5432/YapApp.DB";
     private static final String USER = "yapApp_Server";
@@ -8,7 +11,7 @@ class DataBase {
 
     DataBase() {
         try{
-           processBuilder = new ProcessBuilder(
+            processBuilder = new ProcessBuilder(
                     "/opt/homebrew/bin/pg_ctl", "start", "-D", "/opt/homebrew/var/postgresql@14"
             );
             processBuilder.start();
@@ -26,11 +29,11 @@ class DataBase {
 
     public static void main(String[] args) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {}
 
-    public boolean createUser(String email, String username, String password) {
+    public boolean createUser(String email, String username, String password, Connection connection) {
         String insertUserSQL = "INSERT INTO users (email, username, password) VALUES (?, ?, ?)";
 
         try (PreparedStatement insertStmt = connection.prepareStatement(insertUserSQL)) {
-            String hashedPassword = BCrypt.hashpw(Password, BCrypt.gensalt());
+            String hashedPassword = SecurityUtils.hashPassword(password);
 
             insertStmt.setString(1, email);
             insertStmt.setString(2, username);
@@ -45,7 +48,7 @@ class DataBase {
                 System.out.println("Failed to create user.");
                 return false;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
@@ -99,7 +102,7 @@ class DataBase {
     public boolean updatePassword(String email, String newPassword) {
         String updatePasswordSQL = "UPDATE users SET password = ? WHERE email = ?";
 
-        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        String hashedPassword = SecurityUtils.hashPassword(newPassword); // Using PBKDF2
 
         try (PreparedStatement updateStmt = connection.prepareStatement(updatePasswordSQL)) {
             updateStmt.setString(1, hashedPassword);
@@ -114,7 +117,7 @@ class DataBase {
                 System.out.println("No user found with email: " + email);
                 return false;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
