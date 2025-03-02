@@ -1,14 +1,10 @@
 import java.sql.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 class UserAlreadyExistsException extends Exception {
     UserAlreadyExistsException(String message) {
-        super(message);
-    }
-}
-
-class ChannelAlreadyExistsException extends Exception {
-    ChannelAlreadyExistsException(String message) {
         super(message);
     }
 }
@@ -42,7 +38,7 @@ class DataBase {
         }
     }
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException, UserAlreadyExistsException, ChannelAlreadyExistsException {
+    public static void main(String[] args) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException, UserAlreadyExistsException{
         DataBase db = new DataBase();
 
         String userEmail1 = "k.shivaram252@gmail.com";
@@ -69,6 +65,11 @@ class DataBase {
         db.sendMessage(channel_id, userEmail1, "Okay talk to you later.");
         db.sendMessage(channel_id, userEmail2, "Bye.");
 
+        List<String> messages = db.getLast100Messages(channel_id);
+        for (String msg : messages) {
+            System.out.println(msg);
+        }
+
         db.removeUserFromChannel(userEmail2, channel_id);
         db.deleteChannel(channel_id);
         db.deleteUser(userEmail2);
@@ -94,7 +95,7 @@ class DataBase {
         }
     }
 
-    public String createChannel(String channel_name, String email) throws ChannelAlreadyExistsException {
+    public String createChannel(String channel_name, String email){
         int channel_id = -1;
         String insertChannelSQL = "INSERT INTO channels (channel_name) VALUES (?) RETURNING channel_id";
         String insertUserSQL = "INSERT INTO user_channels (email, channel_id) VALUES (?, ?)";
@@ -251,10 +252,6 @@ class DataBase {
 
     public boolean sendMessage(String channel_id, String senderEmail, String content) {
         String tableName = channel_id;
-        if (!isValidTableName(tableName)) {
-            System.out.println("Invalid table name: " + tableName);
-            return false;
-        }
 
         String insertMessageSQL = "INSERT INTO \"" + tableName + "\" (sender_email, content, time) VALUES (?, ?, ?)";
 
@@ -271,7 +268,26 @@ class DataBase {
         }
     }
 
-    private boolean isValidTableName(String tableName) {
-        return tableName.matches("^[a-zA-Z_][a-zA-Z0-9_]*$");
+    public List<String> getLast100Messages(String channel_id) {
+        List<String> messages = new ArrayList<>();
+
+        String fetchMessagesSQL = "SELECT sender_email, content, time FROM \"" + channel_id + "\" " +
+                "ORDER BY time DESC LIMIT 100";
+
+        try (PreparedStatement stmt = connection.prepareStatement(fetchMessagesSQL);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String sender = rs.getString("sender_email");
+                String content = rs.getString("content");
+                String timestamp = rs.getTimestamp("time").toString();
+
+                messages.add("[" + timestamp + "] " + sender + ": " + content);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return messages;
     }
 }
