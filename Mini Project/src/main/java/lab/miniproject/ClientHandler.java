@@ -15,6 +15,8 @@ public class ClientHandler implements Runnable {
     private String clientEmail;
     private Connection dbConnection;
 
+
+
     public ClientHandler(Socket socket) {
         try {
             this.socket = socket;
@@ -62,13 +64,13 @@ public class ClientHandler implements Runnable {
     }
 
     private boolean handleLogin(String email, String password) throws IOException {
-        String sql = "SELECT hashed_password FROM users WHERE email = ?";
+        String sql = "SELECT password FROM users WHERE email = ?";
         ROT42069 secret = new ROT42069();
         try (PreparedStatement pstmt = dbConnection.prepareStatement(sql)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
 
-            if (rs.next() && rs.getString("hashed_password").equals(secret.rot42069(password))) {
+            if (rs.next() && rs.getString("password").equals(secret.rot42069(password))) {
                 this.clientEmail = email;
                 clientHandlers.add(this);
                 bufferedWriter.write("SUCCESS");
@@ -98,14 +100,8 @@ public class ClientHandler implements Runnable {
             return false;
         }
 
-        String sql = "INSERT INTO users (email, username, hashed_password) VALUES (?, ?, ?)";
-        ROT42069 secret = new ROT42069();
-        try (PreparedStatement pstmt = dbConnection.prepareStatement(sql)) {
-            pstmt.setString(1, email);
-            pstmt.setString(2, username);
-            pstmt.setString(3, secret.rot42069(password));
-            pstmt.executeUpdate();
-
+        DataBase db = new DataBase();
+        if(db.createUser(email, username, password)){
             this.clientEmail = email;
             clientHandlers.add(this);
             System.out.println("SUCCESS");
@@ -114,13 +110,39 @@ public class ClientHandler implements Runnable {
             bufferedWriter.flush();
             broadcastMessage("SERVER: " + username + " has joined the chat!");
             return true;
-        } catch (SQLException e) {
+        }
+        else{
             System.out.println("Signup failed: Database error");
             bufferedWriter.write("Signup failed: Database error");
             bufferedWriter.newLine();
             bufferedWriter.flush();
             return false;
         }
+
+
+//        String sql = "INSERT INTO users (email, username, password) VALUES (?, ?, ?)";
+//        ROT42069 secret = new ROT42069();
+//        try (PreparedStatement pstmt = dbConnection.prepareStatement(sql)) {
+//            pstmt.setString(1, email);
+//            pstmt.setString(2, username);
+//            pstmt.setString(3, secret.rot42069(password));
+//            pstmt.executeUpdate();
+//
+//            this.clientEmail = email;
+//            clientHandlers.add(this);
+//            System.out.println("SUCCESS");
+//            bufferedWriter.write("SUCCESS");
+//            bufferedWriter.newLine();
+//            bufferedWriter.flush();
+//            broadcastMessage("SERVER: " + username + " has joined the chat!");
+//            return true;
+//        } catch (SQLException e) {
+//            System.out.println("Signup failed: Database error");
+//            bufferedWriter.write("Signup failed: Database error");
+//            bufferedWriter.newLine();
+//            bufferedWriter.flush();
+//            return false;
+//        }
     }
 
     private boolean userExists(String email) {

@@ -11,6 +11,7 @@ public class Client {
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     private String email;
+    private String username;
 
     public Client(Socket socket) {
         try {
