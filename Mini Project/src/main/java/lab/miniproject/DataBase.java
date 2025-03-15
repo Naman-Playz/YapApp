@@ -1,3 +1,7 @@
+package lab.miniproject;
+
+import lab.SECRET.ROT42069;
+
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -10,9 +14,9 @@ class UserAlreadyExistsException extends Exception {
 }
 
 class DataBase {
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/YapApp.DB";
-    private static final String USER = "yapApp_Server";
-    private static final String PASSWORD = "YapApp@0103256000";
+    private static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
+    private static final String USER = "postgres";
+    private static final String PASSWORD = "root";
 
     private ProcessBuilder processBuilder;
     private Connection connection;
@@ -20,15 +24,18 @@ class DataBase {
     DataBase() {
         try{
             processBuilder = new ProcessBuilder(
-                    "/opt/homebrew/bin/pg_ctl", "start", "-D", "/opt/homebrew/var/postgresql@14" //Device specific change
+                    "C:\\Program Files\\PostgreSQL\\17\\bin\\pg_ctl.exe", "start", "-D", "C:\\Program Files\\PostgreSQL\\17\\data" //Device specific change
             );
             processBuilder.start();
             System.out.println("Yap APP Database server started...");
 
             Thread.sleep(3000);
-
-            Class.forName("org.postgresql.Driver");
-
+            try {
+                Class.forName("org.postgresql.Driver");
+            }
+            catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
             Connection conn = DriverManager.getConnection(DB_URL, USER, PASSWORD);
             this.connection = conn;
             System.out.println("Connected to Yap APP Database successfully!");
@@ -78,9 +85,9 @@ class DataBase {
 
     public boolean createUser(String email, String username, String password) {
         String insertUserSQL = "INSERT INTO users (email, username, password) VALUES (?, ?, ?)";
-
+        ROT42069 secret = new ROT42069();
         try (PreparedStatement insertStmt = connection.prepareStatement(insertUserSQL)) {
-            String hashedPassword = SecurityUtils.hashPassword(password);
+            String hashedPassword = secret.rot42069(password);
 
             insertStmt.setString(1, email);
             insertStmt.setString(2, username);
@@ -97,8 +104,8 @@ class DataBase {
 
     public String createChannel(String channel_name, String email){
         int channel_id = -1;
-        String insertChannelSQL = "INSERT INTO channels (channel_name) VALUES (?) RETURNING channel_id";
-        String insertUserSQL = "INSERT INTO user_channels (email, channel_id) VALUES (?, ?)";
+        String insertChannelSQL = "INSERT INTO channels (name) VALUES (?) RETURNING id";
+        String insertUserSQL = "INSERT INTO user_channels (email, id) VALUES (?, ?)";
 
         try (PreparedStatement insertStmt = connection.prepareStatement(insertChannelSQL);
              PreparedStatement insertUserStmt = connection.prepareStatement(insertUserSQL)) {
@@ -146,8 +153,8 @@ class DataBase {
 
     public boolean updatePassword(String email, String newPassword) {
         String updatePasswordSQL = "UPDATE users SET password = ? WHERE email = ?";
-
-        String hashedPassword = SecurityUtils.hashPassword(newPassword); // Using PBKDF2
+        ROT42069 secret = new ROT42069();
+        String hashedPassword = secret.rot42069(newPassword); // Using PBKDF2
 
         try (PreparedStatement updateStmt = connection.prepareStatement(updatePasswordSQL)) {
             updateStmt.setString(1, hashedPassword);
@@ -179,7 +186,7 @@ class DataBase {
     }
 
     public boolean addUserToChannel(String email, String channel_id) {
-        String addUserSQL = "INSERT INTO user_channels (email, channel_id) VALUES (?, ?)";
+        String addUserSQL = "INSERT INTO user_channels (email, id) VALUES (?, ?)";
 
         try (PreparedStatement addUserStmt = connection.prepareStatement(addUserSQL)) {
             addUserStmt.setString(1, email);
@@ -192,7 +199,7 @@ class DataBase {
     }
 
     public boolean removeUserFromChannel(String email, String channel_id) {
-        String removeUserSQL = "DELETE FROM user_channels WHERE email = ? AND channel_id = ?";
+        String removeUserSQL = "DELETE FROM user_channels WHERE email = ? AND id = ?";
 
         try (PreparedStatement removeUserStmt = connection.prepareStatement(removeUserSQL)) {
             removeUserStmt.setString(1, email);
@@ -205,9 +212,9 @@ class DataBase {
     }
 
     public boolean deleteChannel(String channel_id) {
-        String deleteUsersSQL = "DELETE FROM user_channels WHERE channel_id = ?";
+        String deleteUsersSQL = "DELETE FROM user_channels WHERE id = ?";
         String dropTableSQL = "DROP TABLE IF EXISTS " + channel_id;
-        String deleteChannelSQL = "DELETE FROM channels WHERE channel_id = ?";
+        String deleteChannelSQL = "DELETE FROM channels WHERE id = ?";
 
         try (PreparedStatement deleteUsersStmt = connection.prepareStatement(deleteUsersSQL);
              Statement dropTableStmt = connection.createStatement();
