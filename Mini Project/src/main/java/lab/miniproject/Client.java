@@ -3,6 +3,7 @@ package lab.miniproject;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.SQLException;
 import java.util.Scanner;
 import lab.SECRET.ROT42069;
 
@@ -146,6 +147,8 @@ public class Client {
             if (authenticated) {
                 System.out.println("Connected to server!");
                 //loadLast100Messages()
+                // get username from server
+                // client.username =
                 client.listenForMessage();
                 client.sendMessage();
             } else {

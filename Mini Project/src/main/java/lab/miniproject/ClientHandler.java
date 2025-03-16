@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class ClientHandler implements Runnable {
@@ -13,7 +14,7 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
-//    public static ArrayList<String> clientEmails = new ArrayList<>();
+    private String userName;
     private String clientEmail;
     private Connection dbConnection;
 
@@ -37,6 +38,7 @@ public class ClientHandler implements Runnable {
             String initialMessage = bufferedReader.readLine();
             String[] parts = initialMessage.split(":");
             boolean authenticated = false;
+            DataBase db = new DataBase();
 
             if (parts[0].equals("LOGIN")) {
                 authenticated = handleLogin(parts[1], parts[2]);
@@ -54,24 +56,37 @@ public class ClientHandler implements Runnable {
             while(socket.isConnected()) {
                 try {
                     messageFromClient = bufferedReader.readLine();
-                    // analyze for private message // format /receiverEmail message
-                    if (messageFromClient.contains("/")) {
+                    // analyze for private message // format /receiverEmail message //analyze for different functions
+                    String startsWith = clientEmail + ": /";
+                    if (messageFromClient.startsWith(startsWith)) {
                         int slashIndex = messageFromClient.indexOf("/");
                         int spaceAfterEmail = messageFromClient.indexOf(" ", slashIndex);
 
-                        if (spaceAfterEmail != -1) {
-                            String recipientEmail = messageFromClient.substring(slashIndex + 1, spaceAfterEmail);
-                            String messageContent = messageFromClient.substring(spaceAfterEmail + 1);
+                        if (messageFromClient.startsWith(startsWith + "name")){
+                            String newUserName = messageFromClient.substring(spaceAfterEmail + 1);
+                            changeUserName(newUserName);
+                        }
+                        else {
+                            if (spaceAfterEmail != -1) {
+                                String recipientEmail = messageFromClient.substring(slashIndex + 1, spaceAfterEmail);
+                                String messageContent = messageFromClient.substring(spaceAfterEmail + 1);
 
-                            // Send direct message
-                            sendDirectMessage(recipientEmail, messageContent);
-                        } else {
-                            // Invalid format, broadcast as regular message
-                            broadcastMessage(messageFromClient);
+                                // Send direct message
+                                sendDirectMessage(recipientEmail, messageContent); // save to db
+                                db.sendMessage(clientEmail, recipientEmail,messageContent);
+                                // changeUserName()
+                            } else {
+                                // Invalid format, broadcast as regular message
+                                String messageContent = messageFromClient.substring(messageFromClient.indexOf(" ") + 1);
+                                clientBroadcastMessage(messageContent); // save to db
+                                db.sendMessage(clientEmail, "all",messageContent);
+                            }
                         }
                     } else {
                         // Regular broadcast message
-                        broadcastMessage(messageFromClient);
+                        String messageContent = messageFromClient.substring(messageFromClient.indexOf(" ") + 1);
+                        clientBroadcastMessage(messageContent); //save to db
+                        db.sendMessage(clientEmail, "all",messageContent);
                     }
 
                 } catch(IOException e) {
@@ -83,6 +98,19 @@ public class ClientHandler implements Runnable {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
+
+    private void changeUserName(String username) throws IOException {
+        DataBase db = new DataBase();
+        ClientHandler clientHandler = this;
+        try {
+            db.updateUsername(clientEmail, username);
+            this.userName = username;
+            clientHandler.bufferedWriter.write("USERNAME_CHANGED");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void sendDirectMessage(String recipientEmail, String messageContent) {
         boolean recipientFound = false;
 
@@ -91,7 +119,7 @@ public class ClientHandler implements Runnable {
             if (clientHandler.clientEmail.equals(recipientEmail)) {
                 try {
                     // Send the message to the recipient
-                    clientHandler.bufferedWriter.write("DM from " + clientEmail + ": " + messageContent);
+                    clientHandler.bufferedWriter.write("DM from " + userName + ": " + messageContent);
                     clientHandler.bufferedWriter.newLine();
                     clientHandler.bufferedWriter.flush();
 
@@ -120,9 +148,45 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    private void Load100Messages(String email){
+        DataBase db = new DataBase();
+        List<String> loadedMessages = db.getLast100Messages(email);
+        for (String message : loadedMessages) {
+            try {
+                int colonIndex = message.indexOf(":");
+                int secondColonIndex = message.indexOf(":", colonIndex + 1);
+                if(message.startsWith(email)){
+                    if (message.substring( colonIndex + 1).startsWith("all")) {
+                        this.bufferedWriter.write(message.substring(secondColonIndex + 1));
+                        this.bufferedWriter.newLine();
+                        this.bufferedWriter.flush();
+                    }
+                    else {
+                        this.bufferedWriter.write("DM to " + db.getUsername(message.substring(colonIndex + 1, secondColonIndex)) + ": " + message.substring(secondColonIndex + 1));
+                        this.bufferedWriter.newLine();
+                        this.bufferedWriter.flush();
+                    }
+                }
+                else if(message.substring(colonIndex + 1).startsWith(email)){
+                    this.bufferedWriter.write("DM from " + db.getUsername(message.substring(0, colonIndex)) + ": " + message.substring(secondColonIndex + 1));
+                    this.bufferedWriter.newLine();
+                    this.bufferedWriter.flush();
+                }
+                else if(message.substring(colonIndex + 1).startsWith("all")){
+                    this.bufferedWriter.write(db.getUsername(message.substring(0, colonIndex)) + ": " + message.substring(secondColonIndex + 1));
+                    this.bufferedWriter.newLine();
+                    this.bufferedWriter.flush();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     private boolean handleLogin(String email, String password) throws IOException {
         String sql = "SELECT password FROM users WHERE email = ?";
         ROT42069 secret = new ROT42069();
+        DataBase db = new DataBase();
         try (PreparedStatement pstmt = dbConnection.prepareStatement(sql)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
@@ -133,7 +197,9 @@ public class ClientHandler implements Runnable {
                 bufferedWriter.write("SUCCESS");
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
-                broadcastMessage("SERVER: " + email + " has joined the chat!");
+                this.userName = db.getUsername(email);
+                serverBroadcastMessage("SERVER: " + userName + " has joined the chat!"); // change email to username
+                Load100Messages(clientEmail);
                 return true;
             } else {
                 bufferedWriter.write("Invalid email or password");
@@ -160,12 +226,13 @@ public class ClientHandler implements Runnable {
         DataBase db = new DataBase();
         if(db.createUser(email, username, password)){
             this.clientEmail = email;
+            this.userName = username;
             clientHandlers.add(this);
             System.out.println("SUCCESS");
             bufferedWriter.write("SUCCESS");
             bufferedWriter.newLine();
             bufferedWriter.flush();
-            broadcastMessage("SERVER: " + username + " has joined the chat!");
+            serverBroadcastMessage("SERVER: " + username + " has joined the chat!");
             return true;
         }
         else{
@@ -187,16 +254,25 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void broadcastMessage(String messageToSend) {
+    public void clientBroadcastMessage(String messageToSend) {
         for(ClientHandler clientHandler : clientHandlers) {
             try {
-//                if(receiverEmail != null) {
-//                    if(clientHandler.clientEmail.equals(receiverEmail)) {
-//                        clientHandler.bufferedWriter.write(messageToSend);
-//                        clientHandler.bufferedWriter.newLine();
-//                        clientHandler.bufferedWriter.flush();
-//                    }
-//                }
+                if (!clientHandler.clientEmail.equals(clientEmail)) {
+                    String formattedMessage = userName + ": " + messageToSend;
+                    clientHandler.bufferedWriter.write(formattedMessage);
+                    clientHandler.bufferedWriter.newLine();
+                    clientHandler.bufferedWriter.flush();
+                }
+
+            } catch(IOException e) {
+                closeEverything(socket, bufferedReader, bufferedWriter);
+            }
+        }
+    }
+
+    public void serverBroadcastMessage(String messageToSend) {
+        for(ClientHandler clientHandler : clientHandlers) {
+            try {
                 if (!clientHandler.clientEmail.equals(clientEmail)) {
                     clientHandler.bufferedWriter.write(messageToSend);
                     clientHandler.bufferedWriter.newLine();
@@ -211,7 +287,7 @@ public class ClientHandler implements Runnable {
 
     public void removeClientHandler() {
         clientHandlers.remove(this);
-        broadcastMessage("SERVER: " + clientEmail + " has left the chat!");
+        serverBroadcastMessage("SERVER: " + userName + " has left the chat!");
     }
 
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
