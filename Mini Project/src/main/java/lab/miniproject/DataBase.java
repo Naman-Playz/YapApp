@@ -84,7 +84,7 @@ class DataBase {
     }
 
     public boolean createUser(String email, String username, String password) {
-        String insertUserSQL = "INSERT INTO users (email, username, password) VALUES (?, ?, ?)";
+        String insertUserSQL = "INSERT INTO users (email, username, password, time) VALUES (?, ?, ?, ?)";
         ROT42069 secret = new ROT42069();
         try (PreparedStatement insertStmt = connection.prepareStatement(insertUserSQL)) {
             String hashedPassword = secret.rot42069(password);
@@ -92,6 +92,7 @@ class DataBase {
             insertStmt.setString(1, email);
             insertStmt.setString(2, username);
             insertStmt.setString(3, hashedPassword);
+            insertStmt.setTimestamp(4, Timestamp.from(Instant.now()));
 
             int rowsAffected = insertStmt.executeUpdate();
 
@@ -271,34 +272,35 @@ class DataBase {
 //        }
 //    }
 
-    public boolean deleteUser(String email) {
-        String deleteFromUserChannelsSQL = "DELETE FROM user_channels WHERE email = ?";
-        String deleteUserSQL = "DELETE FROM users WHERE email = ?";
-
-        try (PreparedStatement deleteUserChannelsStmt = connection.prepareStatement(deleteFromUserChannelsSQL);
-             PreparedStatement deleteUserStmt = connection.prepareStatement(deleteUserSQL)) {
-
-            deleteUserChannelsStmt.setString(1, email);
-            deleteUserChannelsStmt.executeUpdate();
-
-            deleteUserStmt.setString(1, email);
-            int rowsDeleted = deleteUserStmt.executeUpdate();
-
-            return rowsDeleted > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+//    public boolean deleteUser(String email) {
+//        String deleteFromUserChannelsSQL = "DELETE FROM user_channels WHERE email = ?";
+//        String deleteUserSQL = "DELETE FROM users WHERE email = ?";
+//
+//        try (PreparedStatement deleteUserChannelsStmt = connection.prepareStatement(deleteFromUserChannelsSQL);
+//             PreparedStatement deleteUserStmt = connection.prepareStatement(deleteUserSQL)) {
+//
+//            deleteUserChannelsStmt.setString(1, email);
+//            deleteUserChannelsStmt.executeUpdate();
+//
+//            deleteUserStmt.setString(1, email);
+//            int rowsDeleted = deleteUserStmt.executeUpdate();
+//
+//            return rowsDeleted > 0;
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
 
     public boolean sendMessage(String senderEmail,String receiverEmail, String content) {
-        String insertMessageSQL = "INSERT INTO messages (sender_email, receiver_email, content) VALUES (?, ?, ?)";
+        String insertMessageSQL = "INSERT INTO messages (sender_email, receiver_email, content, time) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement insertStmt = connection.prepareStatement(insertMessageSQL)) {
             insertStmt.setString(1, senderEmail);
             insertStmt.setString(2, receiverEmail);
             insertStmt.setString(3, content);
+            insertStmt.setTimestamp(4, Timestamp.from(Instant.now()));
 
             insertStmt.executeUpdate();
             return true;
@@ -310,14 +312,29 @@ class DataBase {
 
     public List<String> getLast100Messages(String email) {
         List<String> messages = new ArrayList<>();
+        Timestamp time = null;
 
-        String fetchMessagesSQL = "SELECT * FROM messages WHERE receiver_email IN (?, ?) OR sender_email = ? " +
+        String fetchMessagesSQL = "SELECT * FROM messages WHERE (receiver_email IN (?, ?) OR sender_email = ?) AND time > ? " +
                 "ORDER BY id ASC LIMIT 100";
+        String fetchTimeSQL = "SELECT time FROM users WHERE email = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(fetchMessagesSQL)) {
             stmt.setString(1, email);
             stmt.setString(2, "all");
             stmt.setString(3, email);
+            try (PreparedStatement fetchTimeStmt = connection.prepareStatement(fetchTimeSQL)) {
+                fetchTimeStmt.setString(1, email);
+
+                try (ResultSet rs = fetchTimeStmt.executeQuery()) {
+                    if (rs.next()) {
+                        time = rs.getTimestamp("time");
+                        stmt.setTimestamp(4, time);
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+             //still need to edit this
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String senderEmail = rs.getString("sender_email");

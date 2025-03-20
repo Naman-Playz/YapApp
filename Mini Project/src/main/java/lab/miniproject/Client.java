@@ -3,9 +3,7 @@ package lab.miniproject;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
-import java.sql.SQLException;
 import java.util.Scanner;
-import lab.SECRET.ROT42069;
 
 public class Client {
     private Socket socket;
@@ -56,6 +54,10 @@ public class Client {
         }).start();
     }
 
+    public BufferedWriter getBufferedWriter() {
+        return bufferedWriter;
+    }
+
     public boolean login(String email, String password) throws IOException {
         this.email = email;
 
@@ -79,6 +81,16 @@ public class Client {
         String response = bufferedReader.readLine();
         return response.equals("SUCCESS");
     }
+    // Add this method to check if the client is still connected
+    public boolean isConnected() {
+        return socket != null && socket.isConnected() && !socket.isClosed();
+    }
+
+    // Add this method to get access to the bufferedReader
+    public BufferedReader getBufferedReader() {
+        return bufferedReader;
+    }
+
 
     public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
         try {
@@ -89,6 +101,16 @@ public class Client {
             e.printStackTrace();
         }
     }
+    public void closeEverything() {
+        try {
+            if(bufferedReader != null) bufferedReader.close();
+            if(bufferedWriter != null) bufferedWriter.close();
+            if(socket != null) socket.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args) {
         try {
@@ -162,4 +184,6 @@ public class Client {
             e.printStackTrace();
         }
     }
+
+
 }
