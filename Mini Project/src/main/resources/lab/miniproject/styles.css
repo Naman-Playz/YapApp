@@ -1,0 +1,142 @@
+/* Base styles */
+.root {
+    -fx-background-color: #f5f5f5;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Header styles */
+.header-bar {
+    -fx-background-color: #2c3e50;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 1);
+}
+
+.app-title {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.user-email {
+    -fx-text-fill: #ecf0f1;
+    -fx-font-size: 14px;
+}
+
+.logout-button {
+    -fx-background-color: #e74c3c;
+    -fx-text-fill: white;
+    -fx-background-radius: 4px;
+    -fx-cursor: hand;
+}
+
+.logout-button:hover {
+    -fx-background-color: #c0392b;
+}
+
+/* Users panel styles */
+.users-panel {
+    -fx-background-color: #ecf0f1;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 0 1 0 0;
+}
+
+.panel-header {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.users-list {
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+
+.users-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 8px;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 0 0 1 0;
+}
+
+.users-list .list-cell:hover {
+    -fx-background-color: #d6eaf8;
+}
+
+/* Chat area styles */
+.chat-scroll-pane {
+    -fx-background-color: white;
+    -fx-background: white;
+    -fx-border-width: 0;
+}
+
+.chat-scroll-pane > .viewport {
+    -fx-background-color: white;
+}
+
+.chat-container {
+    -fx-background-color: white;
+}
+
+/* Message bubbles */
+.message-bubble {
+    -fx-background-radius: 15px;
+    -fx-padding: 10px 15px;
+    -fx-max-width: 80%;
+}
+
+.my-message {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-alignment: center-right;
+}
+
+.other-message {
+    -fx-background-color: #ecf0f1;
+    -fx-text-fill: #2c3e50;
+    -fx-alignment: center-left;
+}
+
+.message-time {
+    -fx-font-size: 10px;
+    -fx-text-fill: #7f8c8d;
+}
+
+.message-sender {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+/* Message input area */
+.message-input-area {
+    -fx-background-color: #ecf0f1;
+    -fx-border-color: #bdc3c7;
+    -fx-border-width: 1 0 0 0;
+}
+
+.message-input {
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 15px;
+}
+
+.send-button {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-min-width: 80px;
+}
+
+.send-button:hover {
+    -fx-background-color: #27ae60;
+}
+
+.attach-button {
+    -fx-background-color: #3498db;
+    -fx-text-fill: white;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+}
+
+.attach-button:hover {
+    -fx-background-color: #2980b9;
+}
