@@ -78,26 +78,31 @@
 
 /* Message bubbles */
 .message-bubble {
-    -fx-background-radius: 15px;
-    -fx-padding: 10px 15px;
-    -fx-max-width: 80%;
+    -fx-padding: 5px 15px;
 }
 
 .my-message {
     -fx-background-color: #3498db;
     -fx-text-fill: white;
     -fx-alignment: center-right;
+    -fx-background-radius: 15px 15px 0px 15px;
 }
 
 .other-message {
     -fx-background-color: #ecf0f1;
     -fx-text-fill: #2c3e50;
     -fx-alignment: center-left;
+    -fx-background-radius: 15px 15px 15px 0px;
 }
 
-.message-time {
+.my-message-time {
     -fx-font-size: 10px;
-    -fx-text-fill: #7f8c8d;
+    -fx-text-fill: white;
+}
+
+.other-message-time {
+    -fx-font-size: 10px;
+    -fx-text-fill: #a0a0a0;
 }
 
 .message-sender {

@@ -191,22 +191,29 @@ public class ClientHandler implements Runnable {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
 
-            if (rs.next() && rs.getString("password").equals(secret.rot42069(password))) {
-                this.clientEmail = email;
-                clientHandlers.add(this);
-                bufferedWriter.write("SUCCESS");
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
-                this.userName = db.getUsername(email);
-                serverBroadcastMessage("SERVER: " + userName + " has joined the chat!"); // change email to username
-                Load100Messages(clientEmail);
-                return true;
-            } else {
-                bufferedWriter.write("Invalid email or password");
+            if (!rs.next()) {
+                bufferedWriter.write("Invalid email");
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
                 return false;
             }
+
+            if (!rs.getString("password").equals(secret.rot42069(password))) {
+                bufferedWriter.write("Invalid password");
+                bufferedWriter.newLine();
+                bufferedWriter.flush();
+                return false;
+            }
+
+            this.clientEmail = email;
+            clientHandlers.add(this);
+            bufferedWriter.write("SUCCESS");
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+            this.userName = db.getUsername(email);
+            serverBroadcastMessage("SERVER: " + userName + " has joined the chat!"); // change email to username
+            Load100Messages(clientEmail);
+            return true;
         } catch (SQLException e) {
             bufferedWriter.write("Login failed: Database error");
             bufferedWriter.newLine();
@@ -218,6 +225,13 @@ public class ClientHandler implements Runnable {
     private boolean handleSignup(String email, String username, String password) throws IOException {
         if (userExists(email)) {
             bufferedWriter.write("Email already exists");
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+            return false;
+        }
+
+        if (!isValidEmail(email)) {
+            bufferedWriter.write("Invalid Email");
             bufferedWriter.newLine();
             bufferedWriter.flush();
             return false;
@@ -304,6 +318,6 @@ public class ClientHandler implements Runnable {
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         Pattern pattern = Pattern.compile(emailRegex);
-        return true;//pattern.matcher(email).matches();
+        return pattern.matcher(email).matches();
     }
 }

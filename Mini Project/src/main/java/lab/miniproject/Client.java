@@ -58,7 +58,7 @@ public class Client {
         return bufferedWriter;
     }
 
-    public boolean login(String email, String password) throws IOException {
+    public String login(String email, String password) throws IOException {
         this.email = email;
 
         // Format: LOGIN:email:password
@@ -66,11 +66,10 @@ public class Client {
         bufferedWriter.newLine();
         bufferedWriter.flush();
 
-        String response = bufferedReader.readLine();
-        return response.equals("SUCCESS");
+        return bufferedReader.readLine();
     }
 
-    public boolean signup(String email, String username, String password) throws IOException {
+    public String signup(String email, String username, String password) throws IOException {
         this.email = email;
 
         // Format: SIGNUP:email:username:password
@@ -79,7 +78,7 @@ public class Client {
         bufferedWriter.flush();
 
         String response = bufferedReader.readLine();
-        return response.equals("SUCCESS");
+        return response;
     }
     // Add this method to check if the client is still connected
     public boolean isConnected() {
@@ -112,78 +111,78 @@ public class Client {
     }
 
 
-    public static void main(String[] args) {
-        try {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("1. Login\n2. Signup");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // consume newline
-
-            Socket socket = new Socket("localhost", 6824);
-            Client client = new Client(socket);
-
-            boolean authenticated = false;
-            String responseMessage = "";
-
-            switch (choice) {
-                case 1:
-                    System.out.println("Enter email: ");
-                    String loginEmail = scanner.nextLine();
-                    System.out.println("Enter password: ");
-                    String loginPassword = scanner.nextLine();
-
-                    try {
-                        authenticated = client.login(loginEmail, loginPassword);
-                        if (!authenticated) {
-                            responseMessage = client.bufferedReader.readLine();
-                        }
-                    } catch (IOException e) {
-                        System.out.println("Error during login: " + e.getMessage());
-                    }
-                    break;
-
-                case 2:
-                    System.out.println("Enter email: ");
-                    String signupEmail = scanner.nextLine();
-                    System.out.println("Enter username: ");
-                    String username = scanner.nextLine();
-                    System.out.println("Enter password: ");
-                    String signupPassword = scanner.nextLine();
-
-                    try {
-                        authenticated = client.signup(signupEmail, username, signupPassword);
-                        if (!authenticated) {
-                            responseMessage = client.bufferedReader.readLine();
-                        }
-                    } catch (IOException e) {
-                        System.out.println("Error during signup: " + e.getMessage());
-                    }
-                    break;
-
-                default:
-                    System.out.println("Invalid choice");
-                    client.closeEverything(socket, client.bufferedReader, client.bufferedWriter);
-                    return;
-            }
-
-            if (authenticated) {
-                System.out.println("Connected to server!");
-                //loadLast100Messages()
-                // get username from server
-                // client.username =
-                client.listenForMessage();
-                client.sendMessage();
-            } else {
-                System.out.println("Authentication failed: " + responseMessage);
-                client.closeEverything(socket, client.bufferedReader, client.bufferedWriter);
-            }
-        } catch (SocketException e) {
-            System.out.println("Lost connection to server. Please try again.");
-        } catch (IOException e) {
-            System.out.println("Cannot connect to server. Please check if server is running.");
-            e.printStackTrace();
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//            Scanner scanner = new Scanner(System.in);
+//            System.out.println("1. Login\n2. Signup");
+//            int choice = scanner.nextInt();
+//            scanner.nextLine(); // consume newline
+//
+//            Socket socket = new Socket("localhost", 6824);
+//            Client client = new Client(socket);
+//
+//            boolean authenticated = false;
+//            String responseMessage = "";
+//
+//            switch (choice) {
+//                case 1:
+//                    System.out.println("Enter email: ");
+//                    String loginEmail = scanner.nextLine();
+//                    System.out.println("Enter password: ");
+//                    String loginPassword = scanner.nextLine();
+//
+//                    try {
+//                        authenticated = client.login(loginEmail, loginPassword);
+//                        if (!authenticated) {
+//                            responseMessage = client.bufferedReader.readLine();
+//                        }
+//                    } catch (IOException e) {
+//                        System.out.println("Error during login: " + e.getMessage());
+//                    }
+//                    break;
+//
+//                case 2:
+//                    System.out.println("Enter email: ");
+//                    String signupEmail = scanner.nextLine();
+//                    System.out.println("Enter username: ");
+//                    String username = scanner.nextLine();
+//                    System.out.println("Enter password: ");
+//                    String signupPassword = scanner.nextLine();
+//
+//                    try {
+//                        authenticated = client.signup(signupEmail, username, signupPassword);
+//                        if (!authenticated) {
+//                            responseMessage = client.bufferedReader.readLine();
+//                        }
+//                    } catch (IOException e) {
+//                        System.out.println("Error during signup: " + e.getMessage());
+//                    }
+//                    break;
+//
+//                default:
+//                    System.out.println("Invalid choice");
+//                    client.closeEverything(socket, client.bufferedReader, client.bufferedWriter);
+//                    return;
+//            }
+//
+//            if (authenticated) {
+//                System.out.println("Connected to server!");
+//                //loadLast100Messages()
+//                // get username from server
+//                // client.username =
+//                client.listenForMessage();
+//                client.sendMessage();
+//            } else {
+//                System.out.println("Authentication failed: " + responseMessage);
+//                client.closeEverything(socket, client.bufferedReader, client.bufferedWriter);
+//            }
+//        } catch (SocketException e) {
+//            System.out.println("Lost connection to server. Please try again.");
+//        } catch (IOException e) {
+//            System.out.println("Cannot connect to server. Please check if server is running.");
+//            e.printStackTrace();
+//        }
+//    }
 
 
 }

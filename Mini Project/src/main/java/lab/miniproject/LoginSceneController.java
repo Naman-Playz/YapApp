@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.net.Socket;
 import java.io.IOException;
 
 public class LoginSceneController {
@@ -30,10 +31,18 @@ public class LoginSceneController {
     }
 
     public void switchToMessages(ActionEvent event) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("messages.fxml"));
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
+        Socket socket = new Socket("localhost", 6824);
+        Client client = new Client(socket);
+
+        String response = client.login(email.getText(), password.getText());
+        error.setText(response);
+
+        if (response.equals("SUCCESS")) {
+            Parent root = FXMLLoader.load(getClass().getResource("messages.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        }
     }
 }

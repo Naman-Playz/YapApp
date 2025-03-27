@@ -4,64 +4,109 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8ba285cc-e657-409e-9a01-d446fd2e4707" name="Changes" comment="" />
+    <list default="true" id="0fda0f04-b4c4-4332-9a1f-e0a31b6dc714" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/YapAppMain.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/ClientHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/LoginSceneController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/LoginSceneController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/MessagesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/MessagesController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/SecurityUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/SecurityUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/SignUpSceneController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/java/lab/miniproject/SignUpSceneController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/resources/lab/miniproject/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/resources/lab/miniproject/login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/resources/lab/miniproject/messages.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/resources/lab/miniproject/messages.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/resources/lab/miniproject/signUp.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/resources/lab/miniproject/signUp.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/src/main/resources/lab/miniproject/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/src/main/resources/lab/miniproject/styles.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/target/classes/lab/miniproject/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/target/classes/lab/miniproject/Client.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/target/classes/lab/miniproject/ClientHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/target/classes/lab/miniproject/ClientHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/target/classes/lab/miniproject/DataBase.class" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/target/classes/lab/miniproject/DataBase.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mini Project/target/classes/module-info.class" beforeDir="false" afterPath="$PROJECT_DIR$/Mini Project/target/classes/module-info.class" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="naman" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;AdityaDey2504&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Naman-Playz/YapApp/&quot;,
+    &quot;accountId&quot;: &quot;6010be23-cfb1-4a83-93c6-4a4246f70a01&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 1
 }</component>
-  <component name="ProjectId" id="2tiP45nGlq7nK0SXdGV2e4fYJj7" />
+  <component name="ProjectId" id="2ufXuYoDLWx9rNr9EuckQWuTLhc" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/shivaram/Documents/Java/YapApp&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Global Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.Server.executor": "Run",
+    "Application.YapApp.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "aditya",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0"
   }
-}</component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.145" />
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.145" />
-      </set>
-    </attachedChunks>
+}]]></component>
+  <component name="RunManager">
+    <configuration name="YapApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="lab.miniproject.YapApp" />
+      <module name="MiniProject" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="lab.miniproject.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.YapApp" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="8ba285cc-e657-409e-9a01-d446fd2e4707" name="Changes" comment="" />
-      <created>1740831727958</created>
+      <changelist id="0fda0f04-b4c4-4332-9a1f-e0a31b6dc714" name="Changes" comment="" />
+      <created>1742640826634</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1740831727958</updated>
-      <workItem from="1740831729018" duration="29207000" />
-      <workItem from="1740983175374" duration="597000" />
-      <workItem from="1741342681244" duration="13594000" />
+      <updated>1742640826634</updated>
     </task>
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
   </component>
 </project>

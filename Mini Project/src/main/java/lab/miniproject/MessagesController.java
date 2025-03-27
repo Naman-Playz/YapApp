@@ -1,14 +1,24 @@
 package lab.miniproject;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -26,13 +36,83 @@ public class MessagesController {
     @FXML private TextField messageField;
     @FXML private Button sendButton;
     @FXML private Button attachButton;
+    @FXML private ScrollPane scrollPane;
 
     private Client client;
     private String userEmail;
 
     public void initialize() {
-        chatMessagesContainer.getChildren().clear();
-        messageField.setOnAction(event -> sendMessage());
+        chatMessagesContainer.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                scrollPane.setVvalue((Double) newValue);
+            }
+        });
+
+        sendButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String message = messageField.getText();
+                if (!message.isEmpty()) {
+                    HBox messageBox = new HBox();
+                    messageBox.setSpacing(5);
+                    messageBox.setAlignment(Pos.CENTER_RIGHT);
+
+                    Label messageLabel = new Label(message);
+                    messageLabel.setWrapText(true);
+                    messageLabel.maxWidthProperty().bind(scrollPane.widthProperty().multiply(0.9));
+
+                    Label timeLabel = new Label(getCurrentTime());
+                    timeLabel.getStyleClass().add("my-message-time");
+
+                    VBox messageContainer = new VBox(messageLabel, timeLabel);
+                    messageContainer.setAlignment(Pos.CENTER_RIGHT);
+                    messageContainer.getStyleClass().add("message-bubble");
+                    messageContainer.getStyleClass().add("my-message");
+
+
+                    messageBox.getChildren().add(messageContainer);
+                    chatMessagesContainer.getChildren().add(messageBox);
+
+                    messageField.setText("");
+                }
+            }
+        });
+
+        messageField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent ke) {
+                if (ke.getCode().equals(KeyCode.ENTER)) {
+                    String message = messageField.getText();
+                    if (!message.isEmpty()) {
+                        HBox messageBox = new HBox();
+                        messageBox.setSpacing(5);
+                        messageBox.setAlignment(Pos.CENTER_LEFT);
+
+                        Label messageLabel = new Label(message);
+                        messageLabel.setWrapText(true);
+                        messageLabel.maxWidthProperty().bind(scrollPane.widthProperty().multiply(0.9));
+
+                        Label timeLabel = new Label(getCurrentTime());
+                        timeLabel.getStyleClass().add("other-message-time");
+
+                        VBox messageContainer = new VBox(messageLabel, timeLabel);
+                        messageContainer.setAlignment(Pos.CENTER_LEFT);
+                        messageContainer.getStyleClass().add("message-bubble");
+                        messageContainer.getStyleClass().add("other-message");
+
+
+                        messageBox.getChildren().add(messageContainer);
+                        chatMessagesContainer.getChildren().add(messageBox);
+
+                        messageField.setText("");
+                    }
+                }
+            }
+        });
+
+        // chatMessagesContainer.getChildren().clear();
+        // messageField.setOnAction(event -> sendMessage());
     }
 
 
@@ -79,26 +159,26 @@ public class MessagesController {
         }).start();
     }
 
-    @FXML
-    private void sendMessage() {
-        String message = messageField.getText().trim();
-        if (!message.isEmpty()) {
-            try {
-                // Use the bufferedWriter directly from the client to send the message
-                client.getBufferedWriter().write(userEmail + ": " + message);
-                client.getBufferedWriter().newLine();
-                client.getBufferedWriter().flush();
-
-                // Add the message to the chat UI immediately (optional - for responsive UI)
-                addMessageToChat(userEmail + ": " + message);
-
-                // Clear the message field after sending
-                messageField.clear();
-            } catch (IOException e) {
-                showAlert("Error", "Could not send message: " + e.getMessage());
-            }
-        }
-    }
+//    @FXML
+//    private void sendMessage() {
+//        String message = messageField.getText().trim();
+//        if (!message.isEmpty()) {
+//            try {
+//                // Use the bufferedWriter directly from the client to send the message
+//                client.getBufferedWriter().write(userEmail + ": " + message);
+//                client.getBufferedWriter().newLine();
+//                client.getBufferedWriter().flush();
+//
+//                // Add the message to the chat UI immediately (optional - for responsive UI)
+//                addMessageToChat(userEmail + ": " + message);
+//
+//                // Clear the message field after sending
+//                messageField.clear();
+//            } catch (IOException e) {
+//                showAlert("Error", "Could not send message: " + e.getMessage());
+//            }
+//        }
+//    }
 
 //    @FXML
 //    private void sendMessage() {
